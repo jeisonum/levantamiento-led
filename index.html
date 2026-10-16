@@ -379,7 +379,7 @@ const SPEC_KEYS=["w","h","pitch","pw","ph","kg","wMax","wAvg","nits","ip","mods"
 
 /* ---------- Estado ---------- */
 const $=id=>document.getElementById(id);
-const blank=()=>({id:"",sitio:"Centro Comercial San Diego",ubicacion:"Entrada Galerías San Diego",ciudad:"Medellín",fecha:new Date().toISOString().slice(0,10),responsable:"Jeison Uribe",anchoEsp:"2",altoEsp:"3,29",alinH:"centro",alinV:"centro",env:"outdoor",marca:"Absen",modelo:"ab-a0425-960",gab:"960x960",rot:"0",montaje:"muro",elev:"",baseIncl:true,piso:"Concreto",superficie:"",chk:{},mock:{x:0.3,y:0.2,w:0.4},mockOn:true,tipoBase:"lamina",marcaBase:true,horas:"18",auto:true,cols:0,rows:0,ov:{},customName:"",foto:null,fotoKB:0,notas:""});
+const blank=()=>({id:"",sitio:"",ubicacion:"",ciudad:"Medellín",fecha:new Date().toISOString().slice(0,10),responsable:"Jeison Uribe",anchoEsp:"",altoEsp:"",alinH:"centro",alinV:"centro",env:"outdoor",marca:"Absen",modelo:"ab-a0425-960",gab:"960x960",rot:"0",montaje:"muro",elev:"",baseIncl:true,piso:"Concreto",superficie:"",chk:{},mock:{x:0.3,y:0.2,w:0.4},mockOn:true,tipoBase:"lamina",marcaBase:true,horas:"18",auto:true,cols:0,rows:0,ov:{},customName:"",foto:null,fotoKB:0,notas:""});
 let S=blank(); S.id=folio();
 function folio(){const d=new Date(),p=n=>String(n).padStart(2,"0");return "LEV-"+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+"-"+p(d.getHours())+p(d.getMinutes())}
 
@@ -662,7 +662,7 @@ $("fotoDel").addEventListener("click",()=>{S.foto=null;S.fotoKB=0;syncInputs();r
 const LS="ico-lev-dooh";
 function store(){try{return JSON.parse(localStorage.getItem(LS)||"[]")}catch(e){return[]}}
 function putStore(a){try{localStorage.setItem(LS,JSON.stringify(a));return true}catch(e){return false}}
-function saveDraft(){try{localStorage.setItem(LS+"-draft",JSON.stringify(S))}catch(e){}}
+function saveDraft(){if(!(S.sitio||S.ubicacion||S.anchoEsp||S.altoEsp||S.notas||S.foto))return;try{localStorage.setItem(LS+"-draft2",JSON.stringify(S))}catch(e){}}
 let DB=null,UID=null,cloudList=null;
 (async()=>{try{const db=await window.claude?.use?.("db"),u=await window.claude?.use?.("user");const id=u?await u.id():null;if(db&&id){DB=db;UID=id}}catch(e){DB=null}
   $("btnSave").textContent=DB?"Guardar en mi cuenta":"Guardar en este dispositivo"})();
@@ -706,7 +706,7 @@ $("drawer").addEventListener("click",async e=>{
 });
 function d0(){$("drawer").hidden=true;$("btnList").textContent="Mis levantamientos"}
 $("btnList").addEventListener("click",()=>{const d=$("drawer");if(d.hidden){d.hidden=false;drawList();$("btnList").textContent="Cerrar lista"}else d0()});
-$("btnNew").addEventListener("click",()=>{S={...blank(),sitio:"",ubicacion:"",anchoEsp:"",altoEsp:"",notas:""};S.id=folio();syncInputs();render();toast("Ficha nueva lista")});
+$("btnNew").addEventListener("click",()=>{S=blank();S.id=folio();try{localStorage.removeItem(LS+"-draft2")}catch(e){}syncInputs();render();toast("Ficha nueva lista")});
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 let tt;function toast(m){document.querySelectorAll(".toast").forEach(x=>x.remove());const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);clearTimeout(tt);tt=setTimeout(()=>t.remove(),2800)}
 
@@ -815,7 +815,7 @@ async function buildPdf(r){
 function notes(doc,x,y,w,T,C1,C2){doc.setFont("helvetica","bold");doc.setFontSize(11);doc.setTextColor(...C1);T("Notas de campo",x,y);doc.setFont("helvetica","normal");doc.setFontSize(9.5);doc.setTextColor(...C2);const ls=doc.splitTextToSize(pdfTxt(S.notas),w);doc.text(ls.slice(0,Math.max(3,Math.floor((297-20-y)/4.6))),x,y+6.5)}
 
 /* ---------- Arranque ---------- */
-try{const d=JSON.parse(localStorage.getItem(LS+"-draft")||"null");if(d&&d.id)S={...blank(),...d}}catch(e){}
+try{const d=JSON.parse(localStorage.getItem(LS+"-draft2")||"null");if(d&&d.id)S={...blank(),...d}}catch(e){}
 syncInputs();render();
 </script>
 
