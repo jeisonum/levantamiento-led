@@ -48,7 +48,10 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 @media (max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}}
 .col{display:flex;flex-direction:column;gap:16px;min-width:0}
 .sticky{position:sticky;top:calc(12px + env(safe-area-inset-top,0px))}
-@media (max-width:900px){.sticky{position:static}}
+@media (max-width:900px){.sticky{position:static}.wrap>.col{display:contents}.wrap section.card{order:var(--o,10)}}
+.cfgbar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;background:var(--soft);border-radius:10px;padding:10px 12px}
+.cfgbar .lbl{font-size:13px;color:var(--muted);font-weight:600;margin-bottom:6px}
+#howtoDet .howto{margin-top:2px}
 section.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:14px}
 h2{font:700 17px/1.2 var(--display);margin:0;display:flex;align-items:center;gap:10px}
 h2 .eb{font:700 11px/1 var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
@@ -167,9 +170,9 @@ details[open] summary{margin-bottom:10px}
 
 <main class="wrap">
   <div class="col">
-    <div class="drawer" id="drawer" hidden></div>
+    <div class="drawer" style="order:0" id="drawer" hidden></div>
 
-    <section class="card">
+    <section class="card" style="--o:1">
       <h2>Sitio</h2>
       <div class="grid2">
         <label class="full">Sitio / proyecto<input id="sitio" placeholder="Ej. Centro Comercial San Diego"></label>
@@ -180,7 +183,7 @@ details[open] summary{margin-bottom:10px}
       </div>
     </section>
 
-    <section class="card">
+    <section class="card" style="--o:2">
       <h2>Equipo</h2>
       <div class="pick"><div class="pk"><span class="n">1</span>Ambiente</div>
         <div class="seg" data-k="env"><button type="button" data-v="outdoor">Outdoor · exterior</button><button type="button" data-v="indoor">Indoor · interior</button></div></div>
@@ -214,13 +217,15 @@ details[open] summary{margin-bottom:10px}
         <p class="note" id="specSrc"></p>
       </details>
     </section>
-    <section class="card">
+    <section class="card" style="--o:3">
       <h2>Espacio y montaje</h2>
+      <div class="pick"><div class="pk">Espacio disponible</div>
+        <div class="seg" data-k="esp"><button type="button" data-v="medido">Lo medí</button><button type="button" data-v="na">No aplica · sé la medida de la pantalla</button></div></div>
       <div class="pick"><div class="pk">Tipo de montaje</div>
         <div class="seg" data-k="montaje"><button type="button" data-v="muro">A muro</button><button type="button" data-v="base">En base</button><button type="button" data-v="colgada">Colgada</button><button type="button" data-v="poste">Poste</button></div></div>
       <div class="grid2">
-        <label>Ancho disponible (m)<input id="anchoEsp" class="num" inputmode="decimal"></label>
-        <label>Alto disponible (m)<input id="altoEsp" class="num" inputmode="decimal"></label>
+        <label><span id="anchoLbl">Ancho disponible (m)</span><input id="anchoEsp" class="num" inputmode="decimal"></label>
+        <label><span id="altoLbl">Alto disponible (m)</span><input id="altoEsp" class="num" inputmode="decimal"></label>
         <label id="elevWrap"><span id="elevLbl">Altura del piso al borde inferior (m)</span><input id="elev" class="num" inputmode="decimal" placeholder="Opcional"></label>
         <label id="pisoWrap">Tipo de piso<select id="piso"><option>Concreto</option><option>Adoquín</option><option>Baldosa</option><option>Tierra o grama</option></select></label>
       </div>
@@ -230,7 +235,7 @@ details[open] summary{margin-bottom:10px}
         <label class="check" style="align-self:end"><input type="checkbox" id="marcaBase"><span>Marcación en la base (powered by i.Co)</span></label>
       </div>
       <label class="check" id="inclWrap"><input type="checkbox" id="baseIncl"><span>El alto que medí es desde el piso (incluye la base)</span></label>
-      <div class="cfg">
+      <div class="cfg" id="alinWrap">
         <div><div class="lbl">Ubicación horizontal</div>
           <div class="seg" data-k="alinH"><button type="button" data-v="izq">Izq.</button><button type="button" data-v="centro">Centro</button><button type="button" data-v="der">Der.</button></div></div>
         <div id="alinVWrap"><div class="lbl">Ubicación vertical</div>
@@ -240,29 +245,14 @@ details[open] summary{margin-bottom:10px}
     </section>
 
 
-    <section class="card">
-      <h2>Configuración</h2>
-      <div class="cfg">
-        <div><div class="lbl">Gabinetes a lo ancho</div>
-          <div class="step"><button type="button" data-st="cols" data-d="-1" aria-label="Quitar columna">−</button><span class="v" id="vCols">0</span><button type="button" data-st="cols" data-d="1" aria-label="Agregar columna">+</button></div></div>
-        <div><div class="lbl">Gabinetes a lo alto</div>
-          <div class="step"><button type="button" data-st="rows" data-d="-1" aria-label="Quitar fila">−</button><span class="v" id="vRows">0</span><button type="button" data-st="rows" data-d="1" aria-label="Agregar fila">+</button></div></div>
-      </div>
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-        <span class="pill auto" id="pillMode">Propuesta automática: máximo que cabe</span>
-        <button class="btn" id="btnAuto" type="button" hidden>Volver a la propuesta</button>
-      </div>
-      <div id="alerts"></div>
-      <div class="howto" id="howto"></div>
-    </section>
 
-    <section class="card">
+    <section class="card" style="--o:6">
       <h2>Lista de chequeo del sitio</h2>
       <div class="chk" id="chk"></div>
       <label>Tipo de superficie o soporte<select id="superficie"><option value="">Sin definir</option><option>Muro de concreto o ladrillo</option><option>Drywall o panel liviano</option><option>Vidrio o fachada flotante</option><option>Estructura metálica existente</option><option>Piso (estructura en base)</option></select></label>
     </section>
 
-    <section class="card">
+    <section class="card" style="--o:7">
       <h2>Foto del sitio y notas</h2>
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
         <label class="btn" style="flex-direction:row;color:var(--ink);font-size:15px;font-weight:600;cursor:pointer">Agregar foto del sitio<input id="foto" type="file" accept="image/*" hidden></label>
@@ -276,9 +266,20 @@ details[open] summary{margin-bottom:10px}
   </div>
 
   <div class="col sticky">
-    <section class="card">
+    <section class="card" style="--o:4">
       <h2>Simulación a escala</h2>
       <div class="simbox" id="sim"></div>
+      <div class="cfgbar">
+        <div><div class="lbl">Gabinetes a lo ancho</div>
+          <div class="step"><button type="button" data-st="cols" data-d="-1" aria-label="Quitar columna">−</button><span class="v" id="vCols">0</span><button type="button" data-st="cols" data-d="1" aria-label="Agregar columna">+</button></div></div>
+        <div><div class="lbl">Gabinetes a lo alto</div>
+          <div class="step"><button type="button" data-st="rows" data-d="-1" aria-label="Quitar fila">−</button><span class="v" id="vRows">0</span><button type="button" data-st="rows" data-d="1" aria-label="Agregar fila">+</button></div></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <span class="pill auto" id="pillMode">Propuesta automática: máximo que cabe</span>
+        <button class="btn" id="btnAuto" type="button" hidden>Volver a la propuesta</button>
+      </div>
+      <div id="alerts"></div>
       <div class="simcap" id="simcap"></div>
       <div class="hero">
         <div><div class="k">Pantalla</div><div class="v" id="hDim">—</div></div>
@@ -288,13 +289,14 @@ details[open] summary{margin-bottom:10px}
         <div><div class="k">Peso</div><div class="v" id="hKg">—</div></div>
         <div><div class="k">Consumo máx.</div><div class="v" id="hKw">—</div></div>
       </div>
+      <details id="howtoDet"><summary>Cómo se calcula</summary><div class="howto" id="howto"></div></details>
     </section>
-    <section class="card">
+    <section class="card" style="--o:5">
       <h2>Comparar tamaños de gabinete</h2>
       <p class="note">Cuánto rinde cada gabinete de esta marca en el espacio medido, normal y girado.</p>
       <div style="overflow-x:auto"><table class="cmp" id="cmp"></table></div>
     </section>
-    <section class="card">
+    <section class="card" style="--o:8">
       <h2>Eléctrico y control</h2>
       <div class="hero" id="elecHero"></div>
       <p class="note">Corriente con el consumo máximo. Circuitos calculados con breaker de 20 A cargado al 80 % (16 A útiles). Es una guía para la visita: el diseño final lo define el electricista.</p>
@@ -307,7 +309,7 @@ details[open] summary{margin-bottom:10px}
         </div>
       </details>
     </section>
-    <section class="card">
+    <section class="card" style="--o:9">
       <h2>Ficha técnica</h2>
       <dl class="specs" id="specs"></dl>
       <p class="note">Especificaciones de referencia tomadas de fichas publicadas. Los valores marcados como estimados se calcularon por metro cuadrado; confírmalos con la ficha oficial del fabricante antes de cotizar estructura o acometida.</p>
@@ -379,7 +381,7 @@ const SPEC_KEYS=["w","h","pitch","pw","ph","kg","wMax","wAvg","nits","ip","mods"
 
 /* ---------- Estado ---------- */
 const $=id=>document.getElementById(id);
-const blank=()=>({id:"",sitio:"",ubicacion:"",ciudad:"Medellín",fecha:new Date().toISOString().slice(0,10),responsable:"Jeison Uribe",anchoEsp:"",altoEsp:"",alinH:"centro",alinV:"centro",env:"outdoor",marca:"Absen",modelo:"ab-a0425-960",gab:"960x960",rot:"0",montaje:"muro",elev:"",baseIncl:true,piso:"Concreto",superficie:"",chk:{},mock:{x:0.3,y:0.2,w:0.4},mockOn:true,tipoBase:"lamina",marcaBase:true,horas:"18",auto:true,cols:0,rows:0,ov:{},customName:"",foto:null,fotoKB:0,notas:""});
+const blank=()=>({id:"",sitio:"",ubicacion:"",ciudad:"Medellín",fecha:new Date().toISOString().slice(0,10),responsable:"Jeison Uribe",esp:"medido",anchoEsp:"",altoEsp:"",alinH:"centro",alinV:"centro",env:"outdoor",marca:"Absen",modelo:"ab-a0425-960",gab:"960x960",rot:"0",montaje:"muro",elev:"",baseIncl:true,piso:"Concreto",superficie:"",chk:{},mock:{x:0.3,y:0.2,w:0.4},mockOn:true,tipoBase:"lamina",marcaBase:true,horas:"18",auto:true,cols:0,rows:0,ov:{},customName:"",foto:null,fotoKB:0,notas:""});
 let S=blank(); S.id=folio();
 function folio(){const d=new Date(),p=n=>String(n).padStart(2,"0");return "LEV-"+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+"-"+p(d.getHours())+p(d.getMinutes())}
 
@@ -409,7 +411,17 @@ function aspect(w,h){
 }
 function calc(){
   const s=spec(), W=num(S.anchoEsp), H=num(S.altoEsp);
-  const r={s,W,H,ok:false};
+  const r={s,W,H,ok:false,na:S.esp==="na"};
+  if(r.na){
+    if(!s.w||!s.h) return r;
+    r.tW=W;r.tH=H;r.el=num(S.elev)||0;
+    r.autoCols=W?Math.max(1,Math.round(W*1000/s.w)):Math.max(1,S.cols||1);
+    r.autoRows=H?Math.max(1,Math.round(H*1000/s.h)):Math.max(1,S.rows||1);
+    if(S.auto){S.cols=r.autoCols;S.rows=r.autoRows}
+    r.cols=Math.max(1,S.cols||1);r.rows=Math.max(1,S.rows||1);S.cols=r.cols;S.rows=r.rows;r.n=r.cols*r.rows;
+    r.sw=r.cols*s.w/1000;r.sh=r.rows*s.h/1000;r.area=r.sw*r.sh;
+    r.W=r.sw;r.H=r.sh;r.effH=r.sh;r.freeW=0;r.freeH=0;
+  }else{
   if(!W||!H||!s.w||!s.h) return r;
   r.autoCols=Math.max(0,Math.floor((W*1000+0.5)/s.w));
   r.el=num(S.elev)||0;r.effH=(S.montaje==="base"&&S.baseIncl)?H-r.el:H;
@@ -418,6 +430,7 @@ function calc(){
   r.cols=S.cols;r.rows=S.rows;r.n=r.cols*r.rows;
   r.sw=r.cols*s.w/1000;r.sh=r.rows*s.h/1000;r.area=r.sw*r.sh;
   r.freeW=W-r.sw;r.freeH=r.effH-r.sh;
+  }
   r.pxW=s.pw?r.cols*s.pw:null;r.pxH=s.ph?r.rows*s.ph:null;
   r.kg=s.kg!=null?r.n*s.kg:null;
   r.kwMax=s.wMax!=null?r.n*s.wMax/1000:null;r.kwAvg=s.wAvg!=null?r.n*s.wAvg/1000:null;
@@ -432,24 +445,25 @@ const isEst=(s,k)=>(s.est||[]).includes(k);
 /* ---------- Simulación SVG ---------- */
 const MONT={muro:"A muro",base:"Estructura en base",colgada:"Colgada",poste:"En poste o bandera"};
 function geom(r){
-  const W=r.W*1000,H=r.H*1000,el=(num(S.elev)||0)*1000,base=S.montaje==="base";
+  const W=r.W*1000,H=r.H*1000,el=(num(S.elev)||0)*1000,base=S.montaje==="base",incl=S.baseIncl&&!r.na;
   const g={W,H,el,base,floor:null,scr:null};
-  if(base) g.floor=S.baseIncl?H:H+el; else if(el>0) g.floor=H+el;
+  if(base) g.floor=incl?H:H+el; else if(el>0) g.floor=H+el;
   if(r.ok){const sw=r.sw*1000,sh=r.sh*1000;const x=S.alinH==="izq"?0:S.alinH==="der"?W-sw:(W-sw)/2;
-    const y=base?(S.baseIncl?H-el:H)-sh:(S.alinV==="arriba"?0:S.alinV==="abajo"?H-sh:(H-sh)/2);
+    const y=base?(incl?H-el:H)-sh:(S.alinV==="arriba"?0:S.alinV==="abajo"?H-sh:(H-sh)/2);
     g.scr={x,y,w:sw,h:sh};if(g.floor!=null){g.hBottom=(g.floor-(y+sh))/1000;g.hTop=(g.floor-y)/1000}}
   return g;
 }
 function simSVG(r){
-  if(!r.W||!r.H) return `<p class="note" style="padding:24px;text-align:center">Ingresa el ancho y el alto del espacio para ver la simulación.</p>`;
+  if(!r.W||!r.H) return `<p class="note" style="padding:24px;text-align:center">${r.na?"Elige el gabinete para ver la simulación.":"Ingresa el ancho y el alto del espacio para ver la simulación."}</p>`;
   const g=geom(r),W=g.W,H=g.H,s=r.s,M=Math.max(W,H,g.floor||0),fs=M*0.034,pad=M*0.2,sc=g.scr;
   const person=g.floor!=null,px=W+pad*0.38+fs*2.2+300;
   const left=-pad-(sc&&g.floor!=null&&g.hBottom>0?fs*0:0),right=person?px+380+fs:W+pad,bottom=(g.floor!=null?g.floor:H)+pad*0.9,top=-pad*0.75;
   let out=`<svg viewBox="${left} ${top} ${right-left} ${bottom-top}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Simulación de la pantalla dentro del espacio medido" font-family="Archivo, Arial, sans-serif" font-weight="600">`;
   out+=`<defs><pattern id="hatch" width="${fs*0.8}" height="${fs*0.8}" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="${fs*0.8}" style="stroke:var(--line)" stroke-width="${fs*0.12}"/></pattern></defs>`;
+  if(!r.na){
   out+=`<rect x="0" y="0" width="${W}" height="${H}" fill="url(#hatch)" style="stroke:var(--muted)" stroke-width="${fs*0.08}" stroke-dasharray="${fs*0.5} ${fs*0.35}"/>`;
   out+=dimH(0,W,-pad*0.38,`Espacio ${fmt(r.W)} m`,fs,"var(--muted)","up");
-  out+=dimV(W+pad*0.38,0,H,`${fmt(r.H)} m`,fs,"var(--muted)","right");
+  out+=dimV(W+pad*0.38,0,H,`${fmt(r.H)} m`,fs,"var(--muted)","right");}
   if(g.floor!=null){
     out+=`<rect x="${left}" y="${g.floor}" width="${right-left}" height="${fs*0.9}" style="fill:var(--soft)"/><line x1="${left}" y1="${g.floor}" x2="${right}" y2="${g.floor}" style="stroke:var(--ink)" stroke-width="${fs*0.1}"/>`;
     const hx=px,ft=g.floor,col="var(--muted)";
@@ -495,7 +509,8 @@ function rows(r){
   if(g.floor!=null&&r.ok){L.push(["Piso a borde inferior",`${fmt(g.hBottom)} m`]);L.push(["Altura total desde el piso",`${fmt(g.hTop)} m`]);}
   L.push(["Medida de la pantalla",r.ok?`${fmt(r.sw)} × ${fmt(r.sh)} m`:"—"]);
   L.push(["Área",r.ok?`${fmt(r.area)} m²`:"—"]);
-  L.push(["Sobrante del espacio",r.ok?`${fmt(r.freeW)} m ancho · ${fmt(r.freeH)} m alto`:"—"]);
+  if(r.na){L.push(["Espacio disponible","No aplica"]);if(r.tW||r.tH)L.push(["Medida pedida",r.tW&&r.tH?`${fmt(r.tW)} × ${fmt(r.tH)} m`:r.tW?`${fmt(r.tW)} m de ancho`:`${fmt(r.tH)} m de alto`]);}
+  else L.push(["Sobrante del espacio",r.ok?`${fmt(r.freeW)} m ancho · ${fmt(r.freeH)} m alto`:"—"]);
   L.push(["Resolución / tamaño del arte",r.pxW?`${fmt0(r.pxW)} × ${fmt0(r.pxH)} px`:"—"]);
   L.push(["Relación de aspecto",r.pxW?aspect(r.pxW,r.pxH):"—"]);
   L.push(["Peso total"+e("kg"),r.kg!=null?`${fmt(r.kg,1)} kg (${fmt(r.kg/r.area,1)} kg/m²)`:"Sin dato"]);
@@ -517,10 +532,13 @@ function render(){
   $("folio").textContent=S.id;
   $("vCols").textContent=r.cols??0;$("vRows").textContent=r.rows??0;
   $("pillMode").className="pill "+(S.auto?"auto":"man");
-  $("pillMode").textContent=S.auto?"Propuesta automática: máximo que cabe":`Ajuste manual (máximo que cabe: ${r.autoCols??0} × ${r.autoRows??0})`;
-  $("btnAuto").hidden=S.auto;
+  if(r.na){const hasT=r.tW||r.tH;$("pillMode").className="pill "+(S.auto&&hasT?"auto":"man");
+    $("pillMode").textContent=!hasT?"Sin espacio: defina los gabinetes con + y −":S.auto?"Propuesta: lo más cercano a la medida que escribió":`Ajuste manual (lo más cercano: ${r.autoCols} × ${r.autoRows})`;
+    $("btnAuto").hidden=S.auto||!hasT;}
+  else{$("pillMode").textContent=S.auto?"Propuesta automática: máximo que cabe":`Ajuste manual (máximo que cabe: ${r.autoCols??0} × ${r.autoRows??0})`;
+  $("btnAuto").hidden=S.auto;}
   const al=[];
-  if(r.W&&r.H&&s.w&&r.autoCols===0||r.W&&r.H&&s.h&&r.autoRows===0) al.push(`<div class="alert bad">El espacio es más pequeño que un gabinete (${fmt0(s.w)} × ${fmt0(s.h)} mm). Revisa las medidas o cambia de gabinete.</div>`);
+  if(!r.na&&(r.W&&r.H&&s.w&&r.autoCols===0||r.W&&r.H&&s.h&&r.autoRows===0)) al.push(`<div class="alert bad">El espacio es más pequeño que un gabinete (${fmt0(s.w)} × ${fmt0(s.h)} mm). Revisa las medidas o cambia de gabinete.</div>`);
   if(r.ok&&(r.freeW<-0.0005||r.freeH<-0.0005)) al.push(`<div class="alert bad">La pantalla no cabe: se pasa ${r.freeW<0?fmt(-r.freeW)+" m de ancho":""}${r.freeW<0&&r.freeH<0?" y ":""}${r.freeH<0?fmt(-r.freeH)+" m de alto":""}.</div>`);
   if(s.w&&s.h&&!s.pw) al.push(`<div class="alert warn">Falta el pitch o los píxeles del gabinete para calcular la resolución.</div>`);
   $("alerts").innerHTML=al.join("");
@@ -538,9 +556,11 @@ function render(){
   $("novaTxt").textContent=nv?`La pantalla tiene ${fmt0(nv.tot)} píxeles: necesita ${nv.ports} puerto${nv.ports>1?"s":""} de red (caben hasta ${nv.perPort} gabinetes por puerto). Normalmente la tarjeta receptora ya viene dentro del gabinete; lo que se elige es el equipo que envía la imagen.`:"Completa la configuración de la pantalla para ver el control.";
   $("novaT").innerHTML=nv?`<tr><th>Equipo</th><th>Capacidad</th><th>Puertos</th><th>¿Sirve?</th></tr>`+nv.ev.map(c=>`<tr class="${(c===nv.taurus||c===nv.mctrl)?"sel":""}"><td><b>${c.name}</b><br><span class="note">${c.fam==="taurus"?"Reproductor asíncrono":"Controladora síncrona"}</span></td><td>${fmt0(c.px)} px<br><span class="note">máx. ${c.maxW}×${c.maxH}</span></td><td>${c.ports}</td><td>${c.ok?`<span class="pill auto">${(c===nv.taurus||c===nv.mctrl)?"Sugerido":"Sirve"}</span>`:`<span class="pill est">No: ${c.why[0]}</span>`}</td></tr>`).join(""):"";
   const base=S.montaje==="base";
-  $("pisoWrap").hidden=!base;$("baseOpts").hidden=!base;$("inclWrap").hidden=!base;$("alinVWrap").hidden=base;
-  $("elevLbl").textContent=base?"Altura de la base (m)":"Altura del piso al borde inferior del espacio (m)";
-  $("montNote").textContent=base?(S.baseIncl?"La pantalla se apoya sobre la base. Al alto medido se le resta la base antes de calcular los gabinetes.":"La pantalla se apoya sobre la base. La base va por debajo del espacio que mediste."):"Si escribes la altura desde el piso, la simulación muestra el piso y una persona de 1,70 m como referencia.";
+  $("pisoWrap").hidden=!base;$("baseOpts").hidden=!base;$("inclWrap").hidden=!base||r.na;$("alinVWrap").hidden=base;$("alinWrap").hidden=r.na;
+  $("anchoLbl").textContent=r.na?"Ancho de la pantalla (m)":"Ancho disponible (m)";$("altoLbl").textContent=r.na?"Alto de la pantalla (m)":"Alto disponible (m)";
+  $("anchoEsp").placeholder=$("altoEsp").placeholder=r.na?"Opcional":"";
+  $("elevLbl").textContent=base?"Altura de la base (m)":r.na?"Altura del piso al borde inferior de la pantalla (m)":"Altura del piso al borde inferior del espacio (m)";
+  $("montNote").textContent=r.na?(base?"La pantalla se apoya sobre la base.":"Si escribes la altura desde el piso, la simulación muestra el piso y una persona de 1,70 m como referencia."):base?(S.baseIncl?"La pantalla se apoya sobre la base. Al alto medido se le resta la base antes de calcular los gabinetes.":"La pantalla se apoya sobre la base. La base va por debajo del espacio que mediste."):"Si escribes la altura desde el piso, la simulación muestra el piso y una persona de 1,70 m como referencia.";
   renderMock(r);
   $("specs").innerHTML=rows(r).map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join("");
   $("specSrc").innerHTML=(s.est&&s.est.length?`<span class="pill est">≈ valores estimados</span> `:"")+"Fuente: "+(s.edited?"ajustado a mano sobre ":"")+(baseModel().src||"");
@@ -551,25 +571,34 @@ function capItems(r){const s=r.s,b=baseModel();return [["Marca",S.marca==="custo
 function howto(r){
   const s=r.s;if(!r.W||!r.H||!s.w||!s.h)return "";
   const f=v=>fmt(v,2),g=v=>mM(v);
+  if(r.na) return `<span class="t">Cómo se calcula</span>
+  ${r.tW?`<div>Ancho pedido: ${f(r.tW)} m ÷ ${g(s.w)} m = ${fmt(r.tW*1000/s.w,2)} → lo más cercano son <b>${r.autoCols}</b> gabinetes</div>`:`<div>Sin ancho pedido: los gabinetes a lo ancho se ponen con + y −</div>`}
+  ${r.tH?`<div>Alto pedido: ${f(r.tH)} m ÷ ${g(s.h)} m = ${fmt(r.tH*1000/s.h,2)} → lo más cercano son <b>${r.autoRows}</b> gabinetes</div>`:`<div>Sin alto pedido: los gabinetes a lo alto se ponen con + y −</div>`}
+  <div>Pantalla: ${r.cols} × ${g(s.w)} = <b>${f(r.sw)} m</b> de ancho · ${r.rows} × ${g(s.h)} = <b>${f(r.sh)} m</b> de alto${r.tW&&r.tH?` (pediste ${f(r.tW)} × ${f(r.tH)} m)`:""}</div>
+  <div>Área: ${f(r.sw)} × ${f(r.sh)} = <b>${f(r.area)} m²</b></div>
+  ${r.pxW?`<div>Resolución: ${r.cols} × ${s.pw} px = <b>${fmt0(r.pxW)}</b> · ${r.rows} × ${s.ph} px = <b>${fmt0(r.pxH)}</b></div>`:""}`;
+  const based=S.montaje==="base"&&S.baseIncl&&r.el>0;
   return `<span class="t">Cómo se calcula</span>
   <div>Ancho: ${f(r.W)} m ÷ ${g(s.w)} m = ${fmt(r.W*1000/s.w,2)} → caben <b>${r.autoCols}</b> gabinetes</div>
-  <div>Alto: ${f(r.H)} m ÷ ${g(s.h)} m = ${fmt(r.H*1000/s.h,2)} → caben <b>${r.autoRows}</b> gabinetes</div>
+  ${based?`<div>Alto útil: ${f(r.H)} m − ${f(r.el)} m de base = <b>${f(r.effH)} m</b></div>`:""}
+  <div>Alto: ${f(r.effH)} m ÷ ${g(s.h)} m = ${fmt(r.effH*1000/s.h,2)} → caben <b>${r.autoRows}</b> gabinetes</div>
   ${r.ok?`<div>Pantalla: ${r.cols} × ${g(s.w)} = <b>${f(r.sw)} m</b> de ancho · ${r.rows} × ${g(s.h)} = <b>${f(r.sh)} m</b> de alto</div>
-  <div>Área: ${f(r.sw)} × ${f(r.sh)} = <b>${f(r.area)} m²</b> · usa el ${fmt0(r.area/(r.W*r.H)*100)} % del espacio</div>
+  <div>Área: ${f(r.sw)} × ${f(r.sh)} = <b>${f(r.area)} m²</b> · usa el ${fmt0(r.area/(r.W*r.effH)*100)} % del espacio</div>
   ${r.pxW?`<div>Resolución: ${r.cols} × ${s.pw} px = <b>${fmt0(r.pxW)}</b> · ${r.rows} × ${s.ph} px = <b>${fmt0(r.pxH)}</b></div>`:""}`:""}`;
 }
 function cmpTable(r){
-  if(!r.W||!r.H||S.marca==="custom")return `<tr><td class="note">Ingresa las medidas del espacio y elige Absen o Unilumin para comparar.</td></tr>`;
+  if(S.marca==="custom"||(r.na?!(r.tW&&r.tH):!(r.W&&r.H)))return `<tr><td class="note">${r.na?"Escribe el ancho y el alto de la pantalla":"Ingresa las medidas del espacio"} y elige Absen o Unilumin para comparar.</td></tr>`;
+  const RW=r.na?r.tW:r.W,RH=r.na?r.tH:r.effH,goal=RW*RH;
   const list=CAT.filter(m=>m.brand===S.marca&&m.env===S.env);
   const sizes=[...new Set(list.map(m=>m.w+"x"+m.h))];
   const opts=[];
   sizes.forEach(z=>{const[w,h]=z.split("x").map(Number);[["0",w,h],["1",h,w]].forEach(([rot,cw,ch])=>{if(rot==="1"&&w===h)return;
-    const c=Math.floor((r.W*1000+0.5)/cw),f=Math.floor((r.H*1000+0.5)/ch),a=c*cw*f*ch/1e6;opts.push({z,rot,cw,ch,c,f,n:c*f,a})})});
-  const best=Math.max(...opts.map(o=>o.a));
-  opts.sort((a,b)=>b.a-a.a);
-  return `<tr><th>Gabinete</th><th>Gab.</th><th>Pantalla</th><th>Área</th><th>Uso del espacio</th><th></th></tr>`+opts.map(o=>{
-    const sel=o.z===S.gab&&o.rot===S.rot,pct=o.a/(r.W*r.H)*100;
-    return `<tr class="${sel?"sel":""}"><td><b>${mM(o.cw)} × ${mM(o.ch)} m</b>${o.rot==="1"?' <span class="note">girado</span>':""}${o.a===best&&o.a>0?' <span class="pill auto">Mejor</span>':""}</td><td>${o.n?`${o.c}×${o.f} = ${o.n}`:"No cabe"}</td><td>${o.n?`${fmt(o.c*o.cw/1000)} × ${fmt(o.f*o.ch/1000)} m`:"—"}</td><td>${o.n?fmt(o.a)+" m²":"—"}</td><td><span class="bar"><i style="width:${Math.min(100,pct)}%"></i></span>${fmt0(pct)} %</td><td>${sel?'<span class="note">En uso</span>':o.n?`<button class="btn" type="button" data-use="${o.z}|${o.rot}">Usar</button>`:""}</td></tr>`}).join("");
+    const c=r.na?Math.max(1,Math.round(RW*1000/cw)):Math.floor((RW*1000+0.5)/cw),f=r.na?Math.max(1,Math.round(RH*1000/ch)):Math.floor((RH*1000+0.5)/ch),a=c*cw*f*ch/1e6;opts.push({z,rot,cw,ch,c,f,n:c*f,a,d:Math.abs(c*cw/1000-RW)+Math.abs(f*ch/1000-RH)})})});
+  const best=r.na?Math.min(...opts.map(o=>o.d)):Math.max(...opts.map(o=>o.a));
+  if(r.na) opts.sort((a,b)=>a.d-b.d); else opts.sort((a,b)=>b.a-a.a);
+  return `<tr><th>Gabinete</th><th>Gab.</th><th>Pantalla</th><th>Área</th><th>${r.na?"Vs. medida pedida":"Uso del espacio"}</th><th></th></tr>`+opts.map(o=>{
+    const sel=o.z===S.gab&&o.rot===S.rot,pct=o.a/goal*100;
+    return `<tr class="${sel?"sel":""}"><td><b>${mM(o.cw)} × ${mM(o.ch)} m</b>${o.rot==="1"?' <span class="note">girado</span>':""}${(r.na?o.d===best:o.a===best&&o.a>0)?` <span class="pill auto">${r.na?"Más cercano":"Mejor"}</span>`:""}</td><td>${o.n?`${o.c}×${o.f} = ${o.n}`:"No cabe"}</td><td>${o.n?`${fmt(o.c*o.cw/1000)} × ${fmt(o.f*o.ch/1000)} m`:"—"}</td><td>${o.n?fmt(o.a)+" m²":"—"}</td><td><span class="bar"><i style="width:${Math.min(100,pct)}%"></i></span>${fmt0(pct)} %</td><td>${sel?'<span class="note">En uso</span>':o.n?`<button class="btn" type="button" data-use="${o.z}|${o.rot}">Usar</button>`:""}</td></tr>`}).join("");
 }
 function fillModels(){
   const brands=["Absen","Unilumin"];
@@ -641,7 +670,7 @@ function composite(r){return new Promise(res=>{const im=new Image();im.onload=()
 /* ---------- Eventos ---------- */
 ["sitio","ubicacion","ciudad","fecha","responsable","notas","customName","horas"].forEach(k=>$(k).addEventListener("input",e=>{S[k]=e.target.value;render()}));
 ["anchoEsp","altoEsp"].forEach(k=>$(k).addEventListener("input",e=>{S[k]=e.target.value;S.auto=true;render()}));
-document.querySelectorAll(".seg").forEach(g=>g.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;S[g.dataset.k]=b.dataset.v;if(["env","rot","montaje"].includes(g.dataset.k)){S.auto=true;if(g.dataset.k==="env"){S.ov={};}}syncInputs();render()}));
+document.querySelectorAll(".seg").forEach(g=>g.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;S[g.dataset.k]=b.dataset.v;if(["env","rot","montaje","esp"].includes(g.dataset.k)){S.auto=true;if(g.dataset.k==="env"){S.ov={};}}syncInputs();render()}));
 $("marcaChips").addEventListener("click",e=>{const b=e.target.closest("[data-marca]");if(!b)return;S.marca=b.dataset.marca;S.ov={};S.auto=true;syncInputs();render()});
 $("gabChips").addEventListener("click",e=>{const b=e.target.closest("[data-gab]");if(!b)return;S.gab=b.dataset.gab;S.modelo="";S.ov={};S.auto=true;fillModels();fillSpecInputs();render()});
 $("pitchChips").addEventListener("click",e=>{const b=e.target.closest("[data-mod]");if(!b)return;S.modelo=b.dataset.mod;S.ov={};S.auto=true;fillModels();fillSpecInputs();render()});
@@ -706,7 +735,10 @@ $("drawer").addEventListener("click",async e=>{
 });
 function d0(){$("drawer").hidden=true;$("btnList").textContent="Mis levantamientos"}
 $("btnList").addEventListener("click",()=>{const d=$("drawer");if(d.hidden){d.hidden=false;drawList();$("btnList").textContent="Cerrar lista"}else d0()});
-$("btnNew").addEventListener("click",()=>{S=blank();S.id=folio();try{localStorage.removeItem(LS+"-draft2")}catch(e){}syncInputs();render();toast("Ficha nueva lista")});
+let newT=null;
+$("btnNew").addEventListener("click",()=>{const b=$("btnNew"),hasData=S.sitio||S.ubicacion||S.anchoEsp||S.altoEsp||S.notas||S.foto;
+  if(hasData&&!b.dataset.confirm){b.dataset.confirm="1";b.textContent="¿Seguro? Se borra la ficha";toast("Toca otra vez para empezar una ficha nueva. Guarda antes si la necesitas.");clearTimeout(newT);newT=setTimeout(()=>{delete b.dataset.confirm;b.textContent="Nuevo"},4000);return}
+  clearTimeout(newT);delete b.dataset.confirm;b.textContent="Nuevo";S=blank();S.id=folio();try{localStorage.removeItem(LS+"-draft2")}catch(e){}syncInputs();render();toast("Ficha nueva lista")});
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 let tt;function toast(m){document.querySelectorAll(".toast").forEach(x=>x.remove());const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);clearTimeout(tt);tt=setTimeout(()=>t.remove(),2800)}
 
@@ -754,10 +786,10 @@ async function buildPdf(r){
     const minX=Math.min(0,sc0?sc0.x:0),maxX=person?g.W+1300:Math.max(g.W,sc0?sc0.x+sc0.w:0),minY=Math.min(0,sc0?sc0.y:0),maxY=Math.max(g.H,g.floor||0,sc0?sc0.y+sc0.h:0);
     const aw=bw-30,ah=bh-34,k=Math.min(aw/(maxX-minX),ah/(maxY-minY)),ox=bx+15+(aw-(maxX-minX)*k)/2-minX*k,oy=by+13+(ah-(maxY-minY)*k)/2-minY*k;
     const X=v=>ox+v*k,Y=v=>oy+v*k;
-    doc.setDrawColor(...MU);doc.setLineWidth(0.25);doc.setLineDashPattern([1.2,0.9],0);doc.rect(X(0),Y(0),g.W*k,g.H*k);doc.setLineDashPattern([],0);
     doc.setFontSize(7.5);doc.setTextColor(...MU);
+    if(!r.na){doc.setDrawColor(...MU);doc.setLineWidth(0.25);doc.setLineDashPattern([1.2,0.9],0);doc.rect(X(0),Y(0),g.W*k,g.H*k);doc.setLineDashPattern([],0);
     T(`Espacio ${fmt(r.W)} m`,X(g.W/2),Y(0)-2.5,{align:"center"});
-    TV(`${fmt(r.H)} m`,X(g.W)+3.6,Y(g.H/2));
+    TV(`${fmt(r.H)} m`,X(g.W)+3.6,Y(g.H/2));}
     if(person){const f=Y(g.floor);doc.setDrawColor(...INK);doc.setLineWidth(0.4);doc.line(bx+4,f,bx+bw-4,f);
       const hx=X(g.W+850);doc.setFillColor(180,184,198);doc.circle(hx,Y(g.floor-1585),115*k,"F");doc.roundedRect(hx-190*k,Y(g.floor-1450),380*k,640*k,60*k,60*k,"F");doc.rect(hx-170*k,Y(g.floor-820),150*k,820*k,"F");doc.rect(hx+20*k,Y(g.floor-820),150*k,820*k,"F");
       doc.setFontSize(6.5);T("1,70 m",hx,Y(g.floor-1700)-1.5,{align:"center"});}
